@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400,
+            height = 400,
+            dataset = [{
+                cx: 100,
+                cy: 100,
+                r: 50
+            }, {
+                cx: 180,
+                cy: 100,
+                r: 50
+            }];
+        let zoom = d3.behavior.zoom() // 创建缩放行为
+            .scaleExtent([1, 10]) // 设置缩放的范围
+            .on('zoom', function (d) {
+                d3.select(this).attr('transform', `translate(${d3.event.translate})scale(${d3.event.scale})`)
+            })
+
+        let svg = d3.select('body').append('svg').attr('width', width).attr('height', height).call(zoom);;
+        svg.selectAll('circle').data(dataset)
+            .enter()
+            .append('circle')
+            .attr('fill', 'red')
+            .attr('cx', (d, i) => {
+                return d.cx;
+            })
+            .attr('cy', (d, i) => {
+                return d.cy;
+            })
+            .attr('r', (d, i) => {
+                return d.r;
+            })
+    </script>
+</body>
+
+</html>

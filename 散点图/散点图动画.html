@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+    <style>
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: red;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        let width = 600,
+            height = 600,
+            padding = {
+                top: 40,
+                left: 40,
+                right: 40,
+                bottom: 40
+            };
+        let svg = d3.select('body').append('svg').attr('width', width).attr('height', height);
+        let dataset = [
+            [0.5, 0.2],
+            [0.8, 0.7],
+            [0.1, 0.5],
+            [0.6, 0.3]
+        ];
+        let xScale = d3.scale.linear().domain([0, 1]).range([0, width - padding.left - padding.right]);
+
+        let yScale = d3.scale.linear().domain([0, 1]).range([0, height - padding.left - padding.right]);
+
+        let circle = svg.selectAll('circle').data(dataset).enter().append('circle').attr('fill', 'red').attr('cx', (d,
+            i) => {
+            return padding.left + xScale(d[0]);
+        }).attr('cy', (d, i) => {
+            return height - padding.bottom - yScale(d[1]);
+        }).attr('r', 10);
+
+        drawAxis(); 
+
+        function drawAxis() {
+            let xAxis = d3.svg.axis().scale(xScale).orient('bottom');
+            yScale.range([height - padding.left - padding.right, 0]);
+            let yAxis = d3.svg.axis().scale(yScale).orient('left');
+            svg.append('g').attr('class', 'axis').attr('transform',
+                    `translate(${padding.left}, ${height - padding.top})`)
+                .call(xAxis);
+            svg.append('g').attr('class', 'axis').attr('transform', `translate(${padding.left}, ${padding.top})`).call(
+                yAxis);
+            // 绘制完成后将值域变回
+            yScale.range([0, height - padding.left - padding.right]);
+        }
+
+        function drawCircle() {
+            // 绑定数据
+            let circleUpdate = svg.selectAll('circle').data(dataset);
+            // 获取enter部分
+            let circleEnter = circleUpdate.enter();
+            // 获取exit部分
+            let circleExit = circleUpdate.exit();
+            // 1. update部分的处理方法
+            // 使用过渡的方式, 缓慢移动到新坐标位置
+            circleUpdate.transition() // 更新数据时启动过渡
+                .duration(500)
+                .attr('cx', (d, i) => {
+                    return padding.left + xScale(d[0]); // 过渡前x坐标
+                }).attr('cy', (d, i) => {
+                    return height - padding.bottom - yScale(d[1]);; // 过渡前x坐标
+                });
+            // 2.enter部分的处理办法
+            circleEnter.append('circle').attr('fill', 'red').attr('cx', (d,
+                    i) => {
+                    return padding.left;
+                }).attr('cy', (d, i) => {
+                    return height - padding.bottom;
+                })
+                .attr('r', 10)
+                .transition()
+                .duration(500)
+                .attr('fill', 'red').attr('cx', (d,
+                    i) => {
+                    return padding.left + xScale(d[0]);
+                }).attr('cy', (d, i) => {
+                    return height - padding.bottom - yScale(d[1]);
+                }).attr('r', 10);
+            // 3.exit部分的处理办法
+            circleExit
+                .transition()
+                .duration(500)
+                .attr('fill', 'white')
+                .remove();
+            console.log(dataset);
+            drawAxis();
+        }
+
+        // 更新
+        function update() {
+            for (let i = 0, len = dataset.length; i < len; i++) {
+                dataset[i][0] = Math.random();
+                dataset[i][1] = Math.random();
+            }
+            drawCircle(dataset);
+        }
+        
+        // setInterval(() => {
+        //     add();
+        // }, 1000)
+
+        // 添加
+        function add() {
+            dataset.push([Math.random(), Math.random()]);
+            drawCircle(dataset);
+        }
+
+        // 删除
+        function sub() {
+            dataset.pop();
+            drawCircle(dataset);
+        }
+    </script>
+    <button onclick="update()">更新</button>
+    <button onclick="add()">添加</button>
+    <button onclick="sub()">删除</button>
+</body>
+
+</html>

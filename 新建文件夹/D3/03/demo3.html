@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+<body>
+    <p>01</p>
+    <p>02</p>
+    <p>03</p>
+    <script>
+         let p = d3.selectAll('p');
+         // 数据绑定
+        //  p.datum(7).append('span').text((d, i) => {
+        //      return d + ' ' + i;
+        //  });
+        let dataset = [
+            {id: 3, name: "张三"},
+            {id: 6, name: "李四"},
+            {id: 9, name: "王五"}
+        ];
+        let dataset2 = [
+            {id: 6, name: "张三"},
+            {id: 9, name: "李四"},
+            {id: 3, name: "王五"}
+        ];
+        p.data([3, 6, 9]);
+        let update = p.data(dataset).text((d, i) => {
+            return d.id + ' ' + d.name
+        });
+        let update2 = p.data(dataset2, (d) => {return d.id;}).text((d, i) => {
+            return d.id + ' ' + d.name
+        });
+    </script>
+</body>
+</html>

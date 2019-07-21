@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+<body>
+    <p>01</p>
+    <p>02</p>
+    <p>03</p>
+    <div></div>
+    <script>
+        
+        let dataset = [
+            {id: 3, name: "张三"},
+            {id: 6, name: "李四"},
+            {id: 5, name: "张三"},
+            {id: 9, name: "李四"},
+        ];
+        let p = d3.select('body').selectAll('p')
+        let update = p.data(dataset);
+        let enter = update.enter();
+        let exit = update.exit();
+        // update.filter((d, i) => {
+        //     if (d.id < 5) {
+        //         return true;
+        //     }
+        // }).text((d, i) => {
+        //     return d.id + ' ' + d.name;
+        // });
+        // update.sort((a, b) => {
+        //     return b - a;
+        // }).text((d, i) => {
+        //     return d.id + ' ' + d.name;
+        // });
+       update.each((d, i) => {
+            d.age = 20;
+        }).text((d, i) => {
+            return d.id + ' ' + d.name + ' ' + d.age;
+        });
+        // call
+        function myFun(selection) {
+            selection.attr('id', 'id');
+        }
+        myFun(d3.select('div'));
+
+        let numbers = [1, 11, 21, 5, 7, 2];
+        // numbers.sort(d3.ascending); // 递增
+        // numbers.sort(d3.descending); // 递减
+        console.log(d3.min(numbers));  // 最小值
+        console.log(d3.min(numbers, (d) => { return d * 3}));  // 最小值
+        console.log(d3.max(numbers));  // 最大值
+        console.log(d3.extent(numbers)); // 最大值和最小值
+        console.log(d3.sum(numbers)); // 总和
+        console.log(d3.mean(numbers)); // 平均值
+        console.log(d3.median(numbers)); // 求数组中间值
+        console.log(d3.quantile(numbers, 1)); // 求分位点的值
+        console.log(d3.variance(numbers)); // 求方差
+        console.log(d3.deviation(numbers)); // 求标准差
+        //numbers.splice(1, 0, 2);
+        console.log(d3.bisectLeft(numbers.sort(d3.ascending), 5)); // 求某数据项左边的位置
+        //console.log(d3.bisectRight(numbers)); // 求某数据项右边的位置
+        console.log(d3.shuffle(numbers)); // 随机排列数组
+        console.log(d3.merge([[1], [2]]));  // 合并两个数组
+        console.log(d3.pairs(numbers));  // 返回邻接的数组对
+        console.log(d3.range(2, 10, 2));  // 返回等差数列
+        let arr = [3, 1, 2]
+        console.log(d3.permute(arr, [2, 1, 0]));  // 根据特定的索引号数组返回排列后的数组
+        console.log(d3.zip([1, 2], [11, 22], [111, 222])); // 用多个数组来制作数组的数组
+        console.log(d3.transpose([[1, 2, 3], [4, 5, 6]])); // 求转置矩阵
+
+        // 映射
+        let map = d3.map(dataset, (d) => { return d.id });
+        console.log(map.has(3)); 
+        console.log(map.get(3)); 
+        console.log(map.set(6, {id: 4, 'color': 'grenn'}));
+        //map.remove(3);
+        console.log(map.keys()); 
+        console.log(map.values()); 
+        console.log(map.entries());
+        console.log(map); 
+
+        // 嵌套结构
+        let persons = [
+            {id: 1, name: '王', year: 1989, hometown: '北京'},
+            {id: 2, name: '李', year: 1987, hometown: '北京'},
+            {id: 3, name: '王', year: 1988, hometown: '上海'},
+            {id: 4, name: '赵', year: 1989, hometown: '广州'},
+        ];
+        let nest = d3.nest().key((d) => {return d.year})
+                            .key((d) => {return d.hometown})
+                            .entries(persons);
+        console.log(nest);
+    </script>
+</body>
+</html>

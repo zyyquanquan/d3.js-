@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+    <script src="js/topojson.js"></script>
+    <script src="mapdata/world2.js"></script>
+    <style>
+        .province {
+            stroke: black;
+            stroke-width: 1px;
+        }
+
+        .southchinasea {
+            stroke: black;
+            stroke-width: 1px;
+            fill: red;
+        }
+    </style>
+</head>
+
+<body style="height: 100%;">
+    <svg width="800" height="400" id="map">
+
+    </svg>
+    <script>
+        width = 800;
+        height = 400;
+
+        let angles = d3.range(0, 180, 5);
+
+        // 创建圆形网格生成器，原点设置在印度洋中部
+        let geocircle = d3.geo.circle()
+            .origin([77, -19]);
+
+        // 定义地图的投影 定义地图的投影orthographic
+        let projection = d3.geo.orthographic() // 投影方法
+            .center([0, 0]) // 设定地图的中心位置 107是经度，31是维度
+            .scale(200) // 设置缩放比例
+            .rotate([-50, 0])
+            .clipAngle(90)
+            .translate([width / 2, height / 2]) // 设置平移量;
+
+        // 定义地理路径生成器
+        let path = d3.geo.path().projection(projection) // 设定投影 
+            .pointRadius(5); // 设置点半径
+
+        let georoot = topojson.feature(world, world.objects.ne_110m_admin_0_countries);
+
+        // 颜色比例尺
+        let color = d3.scale.category20();
+
+        let svg = d3.select('#map');
+
+        let groups = svg.append('g');
+
+        // 地理路径生成器生成路径
+        let gridPath = svg.append('g')
+            .selectAll('.geocircle')
+            .data(angles)
+            .enter()
+            .append('path')
+            .attr('stroke', 'black')
+            .attr('fill', 'none')
+            .attr('d', path)
+            // .attr('d', (d) => {
+            //     let circle = geocircle.angle(d); // 设定角度
+            //     return path(circle()); // 生成网格的GeoJson并获取数据
+            // });
+
+        let countries = groups.selectAll('path')
+            .data(georoot.features)
+            .enter()
+            .append('path')
+            .attr('class', 'province')
+            .style('fill', (d, i) => {
+                return color(i);
+            })
+            .attr('d', path);
+
+        // 获取平移量和缩放量
+        let initRotate = projection.rotate();
+        let initScale = projection.scale();
+
+        let zoom = d3.behavior.zoom()
+            .scaleExtent([1, 10])
+            .on('zoom', (d) => {
+                // 更新投影函数的平移量
+                projection.rotate([
+                    initRotate[0] + 180*d3.event.translate[0]/width,
+                    initRotate[1] + 180*d3.event.translate[1]/height,
+                    initRotate[2]
+                ]);
+
+                // 更新地图的缩放量
+                projection.scale(initScale * d3.event.scale);
+
+                // 重绘地图
+                countries.attr('d', path);
+
+                // 重回经纬度网格
+                gridPath.attr('d', path);
+            });
+
+        // 添加矩形捕捉事件
+        svg.append('rect')
+            .attr('fill', 'none')
+            .attr('stroke', 'black')
+            .attr('pointer-events', 'all')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', width)
+            .attr('height', height)
+            .call(zoom);
+    </script>
+</body>
+
+</html>

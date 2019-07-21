@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动态更新柱状图</title>
+    <script src="../js/d3.min.js"></script>
+    <style>
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: red;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        let width = 400;
+        let height = 400;
+        let padding = {
+            left: 40,
+            top: 40,
+            right: 40,
+            bottom: 40
+        };
+        let svg = d3.select('body').append('svg').attr('width', width).attr('height', height).attr('fill', 'red');
+        let dataset = [20, 60, 50, 70, 80, 10, 30];
+        let xAxisWidth = 320;
+        let yAxisHeight = 320;
+        let xScale = d3.scale.ordinal().domain(d3.range(dataset.length)).rangeRoundBands([0, xAxisWidth], 0.2, 0.2);
+        let yScale = d3.scale.linear().domain([0, d3.max(dataset)]).range([0, yAxisHeight]);
+        let rect = svg.selectAll('rect').data(dataset)
+            .enter()
+            .append('rect')
+            .attr('x', (d, i) => {
+                return padding.left + xScale(i)
+            })
+            .attr('y', (d, i) => {
+                return height - padding.top - yScale(d)
+            })
+            .attr('attr', 'red')
+            .attr('width', xScale.rangeBand())
+            .attr('height', (d) => {
+                return yScale(d);
+            })
+        let xAxis = d3.svg.axis().scale(xScale).orient('bottom');
+        yScale.range([yAxisHeight, 0]);
+        let yAxis = d3.svg.axis().scale(yScale).orient('left');
+
+        let gxAxis = svg.append('g').attr('class', 'axis').attr('transform', `translate(${padding.left}, ${height - padding.top})`).call(xAxis);
+
+        let gyAxis = svg.append('g').attr('class', 'axis').attr('transform', `translate(${padding.left}, ${padding.top})`).call(yAxis);
+
+
+        // 动态更新，添加，删除
+        function drawRect(dataset) {
+            // 重新定义坐标轴
+            let xScale = d3.scale.ordinal().domain(d3.range(dataset.length)).rangeRoundBands([0, xAxisWidth], 0.2, 0.2);
+            let yScale = d3.scale.linear().domain([0, d3.max(dataset)]).range([0, yAxisHeight]);
+            let update = svg.selectAll('rect').data(dataset);
+            let enter = update.enter();
+            let exit = update.exit();
+            // 更新
+            update.transition()
+                .duration(1000)
+                .attr('x', (d, i) => {
+                    return padding.left + xScale(i)
+                })
+                .attr('y', (d, i) => {
+                    return height - padding.top - yScale(d)
+                })
+                .attr('attr', 'red')
+                .attr('width', xScale.rangeBand())
+                .attr('height', (d) => {
+                    return yScale(d);
+                });
+            // 添加
+            enter.append('rect')
+                .attr('x', (d, i) => {
+                    return padding.left + xScale(i)
+                })
+                .attr('y', (d, i) => {
+                    return height - padding.top - yScale(d)
+                })
+                .attr('attr', 'red')
+                .attr('width', xScale.rangeBand())
+                .attr('height', (d) => {
+                    return 0;
+                })
+                .transition()
+                .duration(1000)
+                .attr('height', (d) => {
+                    return yScale(d);
+                });
+            // 删除
+            exit.transition()
+                .duration(1000)
+                .attr('y', (d, i) => {
+                    return height - padding.top
+                })
+                .attr('height', (d) => {
+                    console.log(d);
+                    return 0;
+                })
+                .remove();
+
+            let xAxis = d3.svg.axis().scale(xScale).orient('bottom');
+            yScale.range([yAxisHeight, 0]);
+            let yAxis = d3.svg.axis().scale(yScale).orient('left');
+
+            gxAxis.transition().duration(1000).call(xAxis);
+            gyAxis.transition().duration(1000).call(yAxis);
+        }
+
+        let object = {
+            update: () => {
+                for (let i = 0, len = dataset.length; i < len; i++) {
+                    dataset[i] = Math.random().toFixed(2) * 100;
+                };
+                console.log(dataset);
+                drawRect(dataset);
+            },
+            add: () => {
+                dataset.push(Math.random().toFixed(2) * 100);
+                drawRect(dataset);
+            },
+            sub: () => {
+                dataset.pop();
+                drawRect(dataset);
+            }
+        }
+    </script>
+    <button onclick="object.update()">更新</button>
+    <button onclick="object.add()">添加</button>
+    <button onclick="object.sub()">删除</button>
+</body>
+
+</html>

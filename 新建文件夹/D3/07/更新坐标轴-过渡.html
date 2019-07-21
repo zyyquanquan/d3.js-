@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400,
+            height = 400,
+            padding = {
+                top: 40,
+                left: 60,
+                bottom: 40,
+                right: 40
+            };
+        let svg = d3.select('body').append('svg').attr('width', width).attr('height', height);
+        let xScale = d3.scale.linear().domain([0, 100]).range([0, 200]);
+        let xAxis = d3.svg.axis().scale(xScale).ticks(5).orient('bottom');
+        let g = svg.append('g').attr('transform', 'translate(40, 40)').call(xAxis);
+        xScale.domain([0, 200]);
+        g.transition().duration(2000).call(xAxis);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+    <script src="china.js"></script>
+
+</head>
+
+<body style="height: 100%;">
+    <svg width="800" height="800" id="map">
+    </svg>
+
+    <script>
+        let width = 800;
+        let height = 800;
+
+        let places = {
+            name: '地点',
+            location: [{
+                    name: '北京',
+                    log: 116.3,
+                    lat: 39.9,
+                    img: 'images/beijing.png'
+                },
+                {
+                    name: '上海',
+                    log: 121.4,
+                    lat: 31.2,
+                    img: 'images/beijing.png'
+                }
+            ]
+        }
+
+        // 定义地图的投影
+        let projection = d3.geo.mercator() // 投影方法
+            .center([107, 31]) // 设定地图的中心位置 107是经度，31是维度
+            .scale(600) // 设置缩放比例
+            .translate([width / 2, height / 2]) // 设置平移量;
+
+        // 定义地理路径生成器
+        let path = d3.geo.path().projection(projection); // 设定投影 
+        // 颜色比例尺
+        let color = d3.scale.category20();
+
+        let svg = d3.select('#map');
+
+        let groups = svg.append('g');
+
+        groups.selectAll('path')
+            .data(china.features)
+            .enter()
+            .append('path')
+            .attr('class', 'province')
+            .style('fill', (d, i) => {
+                return color(i);
+            })
+            .attr('d', path);
+
+        // 插入分组元素
+        let address = svg.selectAll('.location')
+            .data(places.location)
+            .enter()
+            .append('g')
+            .attr('fill', 'red')
+            .attr('transform', (d) => {
+                // 计算标注点的位置
+                let coor = projection([d.log, d.lat]);
+                return `translate(${coor[0]}, ${coor[1]})`;
+            });
+
+        // 插入一个圆
+        address.append('circle')
+            .attr('r', 7);
+
+        // 插入图片
+        address.append('image')
+               .attr('x', 20)
+               .attr('y', -40)
+               .attr('width', 100)
+               .attr('height', 100)
+               .attr('xlink:href', (d) => {
+                   return d.img;
+               })
+    </script>
+</body>
+
+</html>

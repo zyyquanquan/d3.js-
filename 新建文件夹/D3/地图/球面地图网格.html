@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+    <script src="js/topojson.js"></script>
+    <script src="mapdata/world2.js"></script>
+    <style>
+        .province {
+            stroke: black;
+            stroke-width: 1px;
+        }
+
+        .southchinasea {
+            stroke: black;
+            stroke-width: 1px;
+            fill: red;
+        }
+    </style>
+</head>
+
+<body style="height: 100%;">
+    <svg width="800" height="400" id="map">
+
+    </svg>
+    <script>
+        width = 800;
+        height = 400;
+
+        let angles = d3.range(0, 180, 5);
+
+        // 创建圆形网格生成器，原点设置在印度洋中部
+        let geocircle = d3.geo.circle()
+            .origin([77, -19]);
+
+        // 定义地图的投影 定义地图的投影orthographic
+        let projection = d3.geo.orthographic() // 投影方法
+            .center([0, 0]) // 设定地图的中心位置 107是经度，31是维度
+            .scale(200) // 设置缩放比例
+            .rotate([-50, 0])
+            .clipAngle(90)
+            .translate([width / 2, height / 2]) // 设置平移量;
+
+        // 定义地理路径生成器
+        let path = d3.geo.path().projection(projection) // 设定投影 
+            .pointRadius(5); // 设置点半径
+
+        let georoot = topojson.feature(world, world.objects.ne_110m_admin_0_countries);
+        console.log(topojson);
+
+        // 颜色比例尺
+        let color = d3.scale.category20();
+
+        let svg = d3.select('#map');
+
+        let groups = svg.append('g');
+
+        // 地理路径生成器生成路径
+        svg.append('g')
+           .selectAll('.geocircle')
+            .data(angles)
+            .enter()
+            .append('path')
+            .attr('stroke', 'black')
+            .attr('fill', 'none')
+            .attr('d', (d) => {
+                let circle = geocircle.angle(d); // 设定角度
+                return path(circle()); // 生成网格的GeoJson并获取数据
+            });
+
+        groups.selectAll('path')
+            .data(georoot.features)
+            .enter()
+            .append('path')
+            .attr('class', 'province')
+            .style('fill', (d, i) => {
+                console.log(d);
+                return color(i);
+            })
+            .attr('d', path);
+    </script>
+</body>
+
+</html>

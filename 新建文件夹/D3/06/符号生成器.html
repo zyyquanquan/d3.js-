@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400;
+        let height = 400;
+        let svg = d3.select('body').append('svg')
+                                   .attr('width', width)
+                                   .attr('height', height);
+        let n = 30;
+        let dataset = [];
+        for (let i = 0; i < n; i++) {
+            dataset.push({
+                size: Math.random() * 30 + 200,
+                type: d3.svg.symbolTypes[Math.floor(Math.random()*d3.svg.symbolTypes.length)]
+            }) 
+        }
+        // 创建一个符号生成器
+        let symbol = d3.svg.symbol()
+                           .size((d) => {return d.size;})
+                           .type((d) => {return d.type;});
+        let color = d3.scale.category20b();
+        svg.selectAll()
+           .data(dataset)
+           .enter()
+           .append('path')
+           .attr('d', (d) => {return symbol(d);})
+           .attr('transform', (d, i) => {
+               let x = 100 + i%5 *20;
+               let y = 100 + Math.floor(i/5)*20;
+               return `translate(${x}, ${y})`;
+           })
+           .attr('fill', (d, i) => {
+               return color(i);
+           })
+    </script>
+</body>
+
+</html>

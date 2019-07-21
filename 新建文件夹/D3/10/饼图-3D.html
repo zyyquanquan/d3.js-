@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400;
+        let height = 400;
+        let svg = d3.select('body').append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        let dataset = [
+            ['小米', 50],
+            ['iphone', 50],
+            ['华为', 100],
+        ];
+        let pie = d3.layout.pie() // 创建饼图布局
+            .value((d) => {
+                return d[1]
+            }); // 值访问器
+
+
+        let piedata = pie(dataset); // 转换数据
+
+        function pieouter(d, rx, ry, ir, h) {
+            let sx = ir * Math.sin(d.startAngle); // 扇形开始X坐标
+            let sy = ir * Math.cos(d.startAngle); // 扇形开始Y坐标
+            let osx = d.startAngle < Math.PI /2 ? rx + h : rx - h; // 起点偏移X坐标
+            let osy = d.startAngle < Math.PI /2 ? ry - h : ry + h; // 起点偏移Y坐标
+            let hsx = d.startAngle < Math.PI /2 ? sx + h : sx - h; // 扇形开始X偏移坐标
+            let hsy = d.startAngle < Math.PI /2 ? -sy - h : -sy + h; // 扇形开始Y偏移坐标
+            let ex = ir * Math.sin(d.endAngle);  // 扇形结束X坐标
+            let ey = ir * Math.cos(d.endAngle);  // 扇形结束Y坐标
+            let hex = d.startAngle < Math.PI /2 ? ex + h : ex - h; // 扇形结束X偏移坐标
+            let hey = d.startAngle < Math.PI /2 ? -ey - h : -ey + h;  // 扇形结束Y偏移坐标
+            // let sx = ir * Math.sin(d.startAngle); // 扇形开始X坐标
+            // let sy = ir * Math.cos(d.startAngle); // 扇形开始Y坐标
+            // let osx = d.endAngle-d.startAngle < Math.PI ? rx + h : rx - h; // 起点偏移X坐标
+            // let osy = d.startAngle < Math.PI /2 ? ry - h : ry + h; // 起点偏移Y坐标
+            // let hsx = d.startAngle < Math.PI /2 ? sx + h : sx - h; // 扇形开始X偏移坐标
+            // let hsy = d.startAngle < Math.PI /2 ? -sy - h : -sy + h; // 扇形开始Y偏移坐标
+            // let ex = ir * Math.sin(d.endAngle);  // 扇形结束X坐标
+            // let ey = ir * Math.cos(d.endAngle);  // 扇形结束Y坐标
+            // let hex = d.startAngle < Math.PI /2 ? ex + h : ex - h; // 扇形结束X偏移坐标
+            // let hey = d.startAngle < Math.PI /2 ? -ey - h : -ey + h;  // 扇形结束Y偏移坐标
+            var ret = [[], []];
+            ret[0].push("M", rx, rx, "L", osx, osy, "L", hsx,  hsy, "L", sx, -sy); // 弧形开始起点小线段
+
+            ret[0].push("M", rx, rx, "L", osx, osy, "L", hex,  hey, "L", ex, -ey); // 弧形终点小线段
+            
+            ret[1].push("M", hsx, hsy, "A", ir, ir, 0, (d.endAngle-d.startAngle > Math.PI? 1: 0), 1, hex, hey, "L", osx, osy, "z"); // 弧形
+            return ret;
+        }
+
+        // function pieouterLine(d, rx, ry, ir, h) {
+        //     let ret = pieouter(d, rx, ry, ir, h);
+        // }
+
+        let outerRadius = width / 3; // 外半径
+        let innerRadius = 0; // 内半径
+        // 创建弧生成器
+        let arc = d3.svg.arc()
+        
+            .innerRadius(innerRadius)
+            .outerRadius(outerRadius);
+        // 创建颜色比例尺
+        // let color = d3.scale.category20();
+        let color = ['hsla(217, 77%, 49%)', 'hsla(179, 87%, 72%)', 'hsla(139, 74%, 83%)'];
+        let colorLight = ['hsla(217, 77%, 40%)', 'hsla(179, 87%, 62%)', 'hsla(139, 74%, 72%)'];
+        // 添加对应数目的弧组，即g元素
+        let innerPie = svg.selectAll('innerPie').data(piedata)
+            .enter()
+            .append('g')
+            .attr('transform', `translate(${width/2}, ${height/2})`);
+
+        let outerPie = svg.selectAll('outerPie').data(piedata)
+            .enter()
+            .append('g')
+            .attr('transform', `translate(${width/2+20}, ${height/2 -20})`);
+
+        innerPie.append('path')
+            .attr('fill', (d, i) => {
+                return color[i];
+            })
+            .attr('d', (d) => {
+                return arc(d); // 使用弧生成器获取路径
+            });
+
+
+        innerPie.selectAll(".topLine").data(piedata).enter().append("path")
+            .attr('stroke', 'none')
+            .attr('fill', (d, i) => {
+                return colorLight[i];
+            })
+            .attr('opacity', '0.6')
+            .attr("d", function (d, i) {
+                    let ret = pieouter(d, 0, 0, outerRadius, 20);
+                    return ret[0].join(' ');
+            });
+
+            innerPie.selectAll(".topSector").data(piedata).enter().append("path")
+            .attr('stroke', 'red')
+            .attr('fill', (d, i) => {
+                return color[i];
+            })
+            .attr('opacity', '0.4')
+            .attr("d", function (d, i) {
+                    let ret = pieouter(d, 0, 0, outerRadius, 20);
+                    return ret[1].join(' ');
+            });   
+
+
+        innerPie.append('text')
+            .attr('transform', (d) => {
+                let x = arc.centroid(d)[0] * 2.5; // 文字的x坐标
+                let y = arc.centroid(d)[1] * 2.5; // 文字的y坐标
+                return `translate(${x}, ${y})`;
+            })
+            .attr('text-anchor', 'middle')
+            .text((d) => {
+                let percent = Number(d.value / d3.sum(dataset, (d) => {
+                    return d[1];
+                })) * 100;
+                return d.data[0] + d.data[1];
+            });
+
+        // 添加链接弧外文字的直线元素
+        innerPie.append('line')
+            .attr('stroke', 'black')
+            .attr('x1', (d) => {
+                return arc.centroid(d)[0] * 2;
+            })
+            .attr('y1', (d) => {
+                return arc.centroid(d)[1] * 2;
+            })
+            .attr('x2', (d) => {
+                return arc.centroid(d)[0] * 2.2;
+            })
+            .attr('y2', (d) => {
+                return arc.centroid(d)[1] * 2.2;
+            });
+    </script>
+</body>
+
+</html>

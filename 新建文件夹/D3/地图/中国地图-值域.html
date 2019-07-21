@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+    <script src="china.js"></script>
+
+</head>
+
+<body style="height: 100%;">
+    <svg width="800" height="800" id="map">
+
+    </svg>
+    <script>
+        width = 800;
+        height = 800;
+
+        // 定义地图的投影
+        let projection = d3.geo.mercator() // 投影方法
+            .center([107, 31]) // 设定地图的中心位置 107是经度，31是维度
+            .scale(600) // 设置缩放比例
+            .translate([width / 2, height / 2]) // 设置平移量;
+
+        // 定义地理路径生成器
+        let path = d3.geo.path().projection(projection); // 设定投影 
+        // 颜色比例尺
+        let palegreen = d3.rgb(66, 251, 75); // 浅绿
+        let darkgreen = d3.rgb(2, 100, 7); // 浅绿
+        let computerColor = d3.interpolate(palegreen, darkgreen); //颜色插值函数 
+
+        // 将插值函数映射到比例尺
+        // let linear = d3.scale.linear().domain([10, 500]).range([0, 1]);
+
+        let valueData = {
+            name: '中国',
+            province: [{
+                    name: '北京市',
+                    value: 300
+                },
+                {
+                    name: '天津市',
+                    value: 100
+                },
+                {
+                    name: '河北省',
+                    value: 210
+                },
+                {
+                    name: '陕西省',
+                    value: 320
+                },
+                {
+                    name: '贵州省',
+                    value: 50
+                }
+            ]
+        }
+
+        let values = [];
+        // 组合数据
+        for (let i = 0; i < valueData.province.length; i++) {
+            let name = valueData.province[i].name;
+            let value = valueData.province[i].value;
+            values[name] = value;
+        }
+
+        // 求最大值和最小值
+        let maxValue = d3.max(valueData.province, (d) => {
+            return d.value;
+        });
+
+        // 定义线性比例尺，将最大值和最小值之间的值映射到[0, 1]
+        let linear = d3.scale.linear()
+            .domain([0, maxValue])
+            .range([0, 1]);
+
+        let svg = d3.select('#map');
+
+        let groups = svg.append('g');
+
+        groups.selectAll('path')
+            .data(china.features)
+            .enter()
+            .append('path')
+            .attr('class', 'province')
+            .style('fill', (d, i) => {
+                let t = linear(values[d.properties.name]);
+                let color = computerColor(t);
+                return color.toString();
+            })
+            .attr('d', (d) => {
+                return path(d);
+            });
+
+        // 渐变
+        let defs = svg.append('defs');
+
+        let linerGradient = defs.append("linearGradient")
+            .attr("id", "linearColor")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "0%");
+
+        let stop1 = linerGradient.append("stop")
+            .attr("offset", "0%")
+            .style("stop-color", palegreen.toString());
+
+        let stop2 = linerGradient.append("stop")
+             .attr("offset", "100%")
+            .attr("stop-color", darkgreen.toString());
+
+        let rect = svg.append('rect')
+                      .attr('x', 20)
+                      .attr('y', 20)
+                      .attr('width', 140)
+                      .attr('height', 30)
+                      .attr('fill', `url(#${linerGradient.attr('id')})`)
+    </script>
+</body>
+
+</html>

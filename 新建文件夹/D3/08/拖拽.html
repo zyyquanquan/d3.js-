@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400,
+            height = 400,
+            dataset = [{
+                cx: 100,
+                cy: 100,
+                r: 50
+            }, {
+                cx: 180,
+                cy: 100,
+                r: 50
+            }];
+        let drag = d3.behavior.drag() // 创建拖拽行为
+            .origin((d) => { // 创建起点坐标
+                return {
+                    x: d.cx,
+                    y: d.cy
+                } // 起点坐标为被拖动物体的圆心坐标
+            })
+            .on('dragstart', () => {
+                console.log('拖拽开始');
+            })
+            .on('dragend', () => {
+                console.log('拖拽结束');
+            })
+            .on('drag', function (d) {
+                d3.select(this) // 选择当前被拖拽的元素
+                    .attr('cx', d.cx = d3.event.x)
+                    .attr('cy', d.cy = d3.event.y)
+            });
+        let svg = d3.select('body').append('svg').attr('width', width).attr('height', height);
+        svg.selectAll('circle').data(dataset)
+            .enter()
+            .append('circle')
+            .attr('fill', 'red')
+            .attr('cx', (d, i) => {
+                return d.cx;
+            })
+            .attr('cy', (d, i) => {
+                return d.cy;
+            })
+            .attr('r', (d, i) => {
+                return d.r;
+            })
+            .call(drag);
+    </script>
+</body>
+
+</html>

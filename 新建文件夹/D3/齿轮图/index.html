@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="../js/d3.min.js"></script>
+  <script src="Donut3D.js"></script>
+</head>
+
+<body>
+  <div style="width: 600px;height: 600px" id="main"></div>
+  <script>
+    let id = 'main';
+
+    var donutChart = document.getElementById(id);
+
+    var width = donutChart.clientWidth;
+    var height = donutChart.clientHeight;
+    var pdata = 80; // 显示80%
+
+    donutChart.innerHTML = ""
+    var svg = d3.select("#" + id).append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .append("g");
+
+    // 画百分比
+    svg.append("text")
+      .attr("x", width / 2 - 20) //文本的起始x坐标
+      .attr("y", height / 6) //文本的起始x坐标
+      .attr("class", "percent_text")
+      .text(pdata + "%");
+
+
+    // 画椭圆
+    svg.append("ellipse")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("rx", width / 2 - 20)
+      .attr("ry", height / 4)
+      .attr("class", "circle_line")
+      .attr("transform", "translate(" + width / 2 + "," + height * 1.2 / 2 + ")");
+    svg.append("ellipse")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("rx", width / 8)
+      .attr("ry", height / 13)
+      .attr("class", "circle_line")
+      .attr("transform", "translate(" + width / 2 + "," + (height / 2 + 5) + ")");
+    svg.append("ellipse")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("rx", width / 15)
+      .attr("ry", height / 22)
+      .attr("class", "circle_line")
+      .attr("transform", "translate(" + width / 2 + "," + (height / 2 + 5) + ")");
+    svg.append("ellipse")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("rx", width / 25)
+      .attr("ry", height / 40)
+      .attr("fill", "#2D3C41") // 实心椭圆：填充颜色
+      .attr("transform", "translate(" + width / 2 + "," + (height / 2 + 5) + ")");
+
+    var baseColor = "#2D3C41" // 暗颜色
+    var color = "#5D858D" // 亮颜色
+    var colorSize = Math.round(16.0 * pdata / 100.0) // 连颜色数量
+    var dataset = []
+    var index = 1;
+
+    while (index < colorSize * 2) {
+      if (index % 2 == 0)
+        dataset.push({
+          label: index.toString(),
+          value: 3.125,
+          color: "transparent"
+        }) // 缝隙
+      else
+        dataset.push({
+          label: index.toString(),
+          value: 3.125,
+          color: color
+        }) // 亮颜色
+      index++
+    }
+
+    while (index <= 32) {
+      if (index % 2 == 0)
+        dataset.push({
+          label: index.toString(),
+          value: 3.125,
+          color: "transparent"
+        }) // 缝隙
+      else
+        dataset.push({
+          label: index.toString(),
+          value: 3.125,
+          color: baseColor
+        }) // 暗颜色
+      index++
+    }
+
+    // 画3D饼图
+    svg.append("g").attr("id", "salesDonut");
+    Donut3D.draw("salesDonut", dataset, width / 2, height / 2, width / 2 - 30, height / 4, 10, 0.6);
+
+    // 左侧面
+    function pieLeftSide(d, rx, ry, h, ir) {
+      var startAngle = d.startAngle;
+      var endAngle = d.endAngle;
+
+      var sx = rx * Math.cos(startAngle),
+        sy = ry * Math.sin(startAngle),
+        ex = rx * Math.cos(endAngle),
+        ey = ry * Math.sin(endAngle);
+
+      var ret = [];
+      ret.push("M", ir * ex, h + ir * ey, "L", ir * ex, ir * ey, "L", ex, ey, "L", ex, h + ey, "z");
+      return ret.join(" ");
+    }
+
+    // 右侧面
+    function pieRightSide(d, rx, ry, h, ir) {
+      var startAngle = d.startAngle;
+      var endAngle = d.endAngle;
+
+      var sx = rx * Math.cos(startAngle),
+        sy = ry * Math.sin(startAngle),
+        ex = rx * Math.cos(endAngle),
+        ey = ry * Math.sin(endAngle);
+
+      var ret = [];
+      ret.push("M", sx, h + sy, "L", sx, sy, "L", ir * sx, ir * sy, "L", ir * sx, h + ir * sy, "z");
+      return ret.join(" ");
+    }
+
+    slices.selectAll(".rightSideSlice").data(_data).enter().append("path").attr("class", "rightSideSlice")
+      .style("fill", function (d) {
+        if (d.data.color == "transparent")
+          return "transparent";
+        else
+          return d3.hsl(d.data.color).darker(1.5);
+      })
+      .attr("d", function (d) {
+        return pieRightSide(d, rx, ry, h, ir);
+      })
+      .each(function (d) {
+        this._current = d;
+      })
+      .attr("opacity", 0)
+      .transition()
+      .delay(function (d, i) { // 延时显示，最终效果是一节一节动态显示
+        return i * 50;
+      })
+      .duration(100)
+      .attr("opacity", 1);
+
+    slices.selectAll(".leftSideSlice").data(_data).enter().append("path").attr("class", "leftSideSlice")
+      .style("fill", function (d) {
+        if (d.data.color == "transparent")
+          return "transparent";
+        else
+          return d3.hsl(d.data.color).darker(1.5);
+      })
+      .attr("d", function (d) {
+        return pieLeftSide(d, rx, ry, h, ir);
+      })
+      .each(function (d) {
+        this._current = d;
+      })
+      .attr("opacity", 0)
+      .transition()
+      .delay(function (d, i) { // 延时显示，最终效果是一节一节动态显示
+        return i * 50;
+      })
+      .duration(100)
+      .attr("opacity", 1);
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let linear = d3.scaleLinear() // 创建一个线性比例尺
+            .domain([0, 500]) // 创建定义域
+            .range([0, 100]); // 创建值域
+            console.log(linear(50));    // 返回定义域的值
+            console.log(linear.invert(50));  // 返回值域的值
+            console.log(linear.domain([0, 100]));  // 设定或获取定义域
+            console.log(linear.range([0, 100]));  // 设定或获取值域
+            console.log(linear(50));    // 返回定义域的值
+            console.log(linear.rangeRound([0, 100]));    // 代替range，使用四舍五入计算
+            console.log(linear(13.33));
+            linear.clamp(true); // 任何超出值域范围的值，都会收缩到值域范围内
+            console.log(linear(1000));    // 返回定义域的值
+            linear.nice(true);  // 将定义域的范围扩展成理想的形式
+            console.log(linear.ticks(10));  // 设定或获取定义域内具有代表性的值的数目
+            console.log(linear.tickFormat(10, '+'));  // 用于设定定义域内具有代表性的值的表现形式
+       
+       // 计算方法   y = 150 -100 = 50    x = 60 - 10 = 50    y/x = 1   
+       // scale(20) 得到   (20 - 10) * 1  + 100  = y
+       let scale = d3.scaleLinear().domain([10, 60]).range([100, 150]);
+       console.log(scale(20));
+       console.log(scale(21));
+       console.log(scale(22));
+       console.log(scale(40));
+
+       // 设置指数比例尺的指数为3
+       let pow = d3.scalePow().exponent(3).domain([0, 3]).range([0, 90]);
+       console.log(pow(3));
+
+       // 量子比例尺 定义域连续，值域离散  50 * 5 = 10 
+       let quantize = d3.scaleQuantize().domain([0, 50]).range(['red', 'blue', 'yellow', 'orange', 'black']);
+       console.log(quantize(3));
+
+       let r = [45, 32, 25, 15, 6];
+
+       let svg = d3.select('body').append('svg')
+                                  .attr('width', 400)
+                                  .attr('height', 400);
+       
+        let circle = svg.selectAll('circle').data(r)
+                                            .enter()
+                                            .append('circle')
+                                            .attr('cx', (d, i) => {
+                                                return 150 + 30 * i;
+                                            })
+                                            .attr('cy', 150)
+                                            .attr('r', (d) => {
+                                                return d;
+                                            })
+                                            .attr('fill', (d) => {
+                                                return quantize(d);
+                                            })
+                                            console.log(circle);
+        
+        let quantize2 = d3.scaleQuantize().domain([0, 10]).range([1, 100]);
+        console.log(quantize2(2));
+
+        // 分段比例尺
+        let quantile = d3.scaleQuantile().domain([0, 2, 4, 10]).range([1, 100]);
+        console.log(quantile(1));
+
+        // 阈值比例尺   将连续的定义域映射到离散的值域里 [-无穷大, 10] : red   [10, 20]: yellow [30, +无穷大]: white
+        let threshold = d3.scaleThreshold().domain([10, 20, 30]).range(['red', 'yellow', 'white']);
+        console.log(threshold(40));
+        console.log(threshold.invertExtent('red'));  // 通过值域求定义域
+
+        // 序数比例尺
+        let ordinal = d3.scaleOrdinal().domain([1, 2, 3, 4, 5]).range([10, 50]);
+        console.log(ordinal(2));
+
+        //let ordinal2 = d3.scaleOrdinal().domain([1, 2, 3, 4, 5]).rangePoints([0,100]);
+        //console.log(ordinal2.range());
+        console.log(d3.version);
+
+        // 颜色比例尺
+        
+    </script>
+</body>
+
+</html>

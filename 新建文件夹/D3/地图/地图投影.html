@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+    <script src="china.js"></script>
+    <style>
+         .province {
+             stroke: black;
+             stroke-width: 1px;
+         }
+
+         .southchinasea {
+             stroke: black;
+             stroke-width: 1px;
+             fill: red;
+         }
+    </style>
+</head>
+
+<body style="height: 100%;">
+    <svg width="800" height="800" id="map">
+
+    </svg>
+    <script>
+        width = 800;
+        height = 800;
+
+        // 定义地图的投影
+        let projection = d3.geo.mercator() // 投影方法
+            .center([107, 31]) // 设定地图的中心位置 107是经度，31是维度
+            .scale(600) // 设置缩放比例
+            .translate([width / 2, height / 2]) // 设置平移量;
+
+        // 定义地理路径生成器
+        let path = d3.geo.path().projection(projection) // 设定投影 
+                                .pointRadius(5);  // 设置点半径
+
+        // 颜色比例尺
+        let color = d3.scale.category20();
+
+        let svg = d3.select('#map');
+
+        let groups = svg.append('g');
+
+        groups.selectAll('path')
+            .data(china.features)
+            .enter()
+            .append('path')
+            .attr('class', 'province')
+            .style('fill', (d, i) => {
+                return color(i);
+            })
+            .attr('d', path)
+            .on('click', (d) => {
+                // 计算面积，中心，边界框
+                let area = path.area(d);
+                let centroid = path.centroid(d);
+                let bounds = path.bounds(d);
+                console.log(d);
+                console.log(`省份：${d.properties.name}`);
+                console.log(`面积：${area}`);
+                console.log(`中心：${centroid}`);
+                console.log(`边界框：${bounds}`);
+
+                // 显示中心
+                svg.append('circle')
+                   .attr('fill', 'red')
+                   .attr('cx', centroid[0])
+                   .attr('cy', centroid[1])
+                   .attr('r', 8);
+
+                // 显示边界框
+                svg.append('rect')
+                   .attr('fill', 'none')
+                   .attr('stroke', 'black')
+                   .attr('x', bounds[0][0])
+                   .attr('y', bounds[0][1])
+                   .attr('width', bounds[1][0] - bounds[0][0])
+                   .attr('height', bounds[1][1] - bounds[0][1]);
+            })
+    </script>
+</body>
+
+</html>

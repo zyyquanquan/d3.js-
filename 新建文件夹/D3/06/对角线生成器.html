@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400;
+        let height = 400;
+        let svg = d3.select('body').append('svg')
+                                   .attr('width', width)
+                                   .attr('height', height);
+        let dataset = {
+            source: {
+                x: 100, y: 100
+            },
+            target: {
+                x: 300, y: 200
+            }
+        }
+        // 创建一个对角线生成器
+        let diagonal = d3.svg.diagonal();
+        // 添加路径
+        svg.append('path')
+           .attr('d', diagonal(dataset))
+           .attr('fill', 'none')
+           .attr('stroke', 'black')
+           .attr('stroke-width', 3);
+    </script>
+</body>
+
+</html>

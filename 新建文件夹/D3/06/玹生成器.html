@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400;
+        let height = 400;
+        let svg = d3.select('body').append('svg')
+                                   .attr('width', width)
+                                   .attr('height', height);
+        let d = {
+            // 起始弧
+            source: {
+                startAngle: 0.2, // 起始角度
+                endAngle: Math.PI*0.3,  // 终止半径
+                radius: 200  // 半径
+            },
+            // 终止弧
+            target: {
+                startAngle: Math.PI*1.0,
+                endAngle: Math.PI*1.6,
+                radius: 100
+            }
+        }
+        // let chord = d3.dvg.chord()
+        //                   .source((d) => {return d.startAngle;})
+        //                   .target((d) => {return d.endAngle;})
+        //                   .radius(200)
+        //                   .startAngle((d) => {return d.startAngle})
+        //                   .endAngle((d) => {return d.endAngle});
+        // 创建一个玹生成器
+        let chord = d3.svg.chord();
+        // 添加路径
+        svg.append('path')
+           .attr('d', chord(d))
+           .attr('transform', 'translate(200, 200)')
+           .attr('fill', 'yellow')
+           .attr('stroke', 'black')
+           .attr('stroke-width', 3);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400,
+            height = 400,
+            padding = {
+                top: 40,
+                left: 60,
+                bottom: 40,
+                right: 40
+            };
+        let svg = d3.select('body').append('svg').attr('width', width).attr('height', height);
+        let rect = svg.append('rect')
+            .attr('x', 10)
+            .attr('y', 10)
+            .attr('width', 100)
+            .attr('height', 30);
+        // let rectTran = rect.transition()
+        //     .delay(500) // 延迟500ms在开始
+        //     .duration(1000) // 过渡时长
+        //     .ease('bounce') // 过渡样式
+        //     .attr('height', 300)
+
+        let rectTran = rect.transition()
+            //.delay(500) // 延迟500ms在开始
+            .duration(2000) // 过渡时长
+            .ease('bounce') // 过渡样式 linear cubic elastic  back bounce  -in -ont  -in-out -out-in
+            .attrTween('width', (d, i, a) => {
+                console.log(d); // 绑定的数据
+                console.log(i); // [0, 1] 0开始 1 结束
+                console.log(a); // a是初始值
+                return (t) => {
+                    return Number(a) + t*300;
+                }
+            })
+            .style('fill', 'red');
+        console.log(rect);
+        console.log(rectTran);
+
+        let text = svg.append('text')
+        .attr('fill', 'white')
+        .attr('x', '100')
+        .attr('y', '10')
+        .attr('dy', '1.2em')
+        .attr('text-anchor', 'end')
+        .text(100);
+        let initx = text.attr('x');
+        let initText = text.text();
+        let textTran = text.transition()
+        .duration(2000)
+        .tween('text', () => {
+            return (t) => {
+                d3.select('text')
+                .attr('x', Number(initx) + t*300)
+                .text(Math.floor(Number(initText) + t*300));
+            }
+        })
+        .remove(); // 最后删除该元素
+    </script>
+</body>
+
+</html>

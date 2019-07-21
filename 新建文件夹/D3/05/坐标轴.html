@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+    <style>
+        .axis path,
+        .axis line{
+            fill: none;
+            stroke: red;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // 颜色比例尺
+        let width = 600;
+        let height = 600;
+        let dataset = d3.range(5);
+        let svg = d3.select('body').append('svg')
+                                   .attr('width', width)
+                                   .attr('height', height);
+        // 用于坐标轴的线性比例尺
+        let xScale = d3.scaleLinear()
+                       .domain([0, 10])
+                       .range([0, 300]);
+        
+        // 定义坐标轴
+        // ticks(5) tickValue([5, 7]) tickSize
+        let axis = d3.axisBottom()
+                     .scale(xScale)
+                     .ticks(5)
+                     .tickSize(10)
+                     .tickFormat(d3.format('$0.1f'));                          
+
+        // 在svg中添加一个包含坐标轴各元素的g元素
+        let gAxis = svg.append('g')
+                       .attr('transform', 'translate(80, 80)')                          
+                       .attr('class', 'axis')
+                       .call(axis);  // 在gAxis中绘制坐标轴
+        
+
+    </script>
+</body>
+
+</html>

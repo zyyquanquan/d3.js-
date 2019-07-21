@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let dataset = [50, 43, 120, 87, 99, 167, 142];
+        let width = 400;
+        let height = 400;
+
+        // x轴宽度
+        let xAxisWidth = 300;
+        // y轴宽度
+        let yAxisHeight = 300;
+
+        // x轴比例尺(序数比例尺)
+        let xScale = d3.scale.ordinal()
+            .domain(d3.range(dataset.length))
+            .rangeRoundBands([0, xAxisWidth], 0.2);
+
+        // x轴
+        
+
+        //  y轴比例尺(线性比例尺)
+        let yScale = d3.scale.linear()
+            .domain([0, d3.max(dataset)])
+            .range([0, yAxisHeight]);
+
+
+
+        let svg = d3.select('body').append('svg').attr('width', width).attr('height', height);
+
+        // 定义上下左右的边框
+        let padding = {
+            top: 40,
+            right: 40,
+            bottom: 40,
+            left: 40
+        };
+        // 矩形所占的宽度(包含空白)，单位为像素
+        let rectStep = 35;
+        // 矩形所占的宽度(不包含空白)，单位为像素
+        let rectWidth = 30;
+        let rect = svg.selectAll('rect').data(dataset) //绑定数据
+            .enter() // 获取enter部分
+            .append('rect') // 添加rect元素，使其与绑定的数组的长度一致
+            .attr('fill', 'steeblue') // 设置颜色
+            .attr('x', (d, i) => {
+                return padding.left + xScale(i);
+            }) // 设置x坐标
+            .attr('y', (d, i) => {
+                return height - padding.bottom - yScale(d);
+            }) // 设置y坐标
+            .attr('width', xScale.rangeBand()) // 设置矩形的宽度
+            .attr('height', (d, i) => {
+                return yScale(d);
+            }); // 设置矩形的高度
+
+                 
+        let xAxis = d3.svg.axis().scale(xScale).orient('bottom');
+        // 重新设置y轴比例尺的值域，与原来的相反
+        yScale.range([yAxisHeight, 0]);
+
+        // y轴
+        let yAxis = d3.svg.axis().scale(yScale).orient('left');
+
+        svg.append('g')
+              .attr('class', 'axis')
+              .attr('transform', 'translate(' + padding.left + ',' + (height - padding.bottom) + ')')
+              .call(xAxis);
+        svg.append('g')
+              .attr('class', 'axis')
+              .attr('transform', 'translate(' + padding.left + ',' + (70) + ')')
+              .call(yAxis);
+        // let text = svg.selectAll('text').data(dataset) // 绑定数据
+        //     .enter() // 获取enter部分
+        //     .append("text") // 添加text元素
+        //     .attr('fill', 'white')
+        //     .attr('font-size', '14px')
+        //     .attr('text-anchor', 'middle')
+        //     .attr('x', (d, i) => {
+        //         return padding.left + i * rectStep;
+        //     })
+        //     .attr('y', (d, i) => {
+        //         return height - padding.bottom - d;
+        //     })
+        //     .attr('dx', rectWidth / 2)
+        //     .attr('dy', '1rem')
+        //     .text((d) => {
+        //         return d;
+        //     });
+
+
+
+
+
+
+
+        //     function draw() {
+        //         // 获取矩形update部分
+        //         let updateRect = svg.selectAll('rect').data(dataset);
+        //         let updateText = svg.selectAll('text').data(dataset);
+        //         // 获取矩形的enter部分
+        //         let enterRect = updateRect.enter();
+        //         let enterText = updateText.enter();
+        //         // 获取矩形的exit部分
+        //         let exitRect = updateRect.exit();
+        //         let exitText = updateText.exit();
+        //         // update处理方法更新属性        
+        //         updateRect.attr('fill', 'steelblue').attr('x', (d, i) => {
+        //                 return padding.left + i * rectStep;
+        //             })
+        //             .attr('y', (d, i) => {
+        //                 return height - padding.bottom - d;
+        //             })
+        //             .attr('width', rectWidth)
+        //             .attr('height', (d) => {
+        //                 return d;
+        //             });
+        //         updateText // 添加text元素
+        //             .attr('fill', 'white')
+        //             .attr('font-size', '14px')
+        //             .attr('text-anchor', 'middle')
+        //             .attr('x', (d, i) => {
+        //                 return padding.left + i * rectStep;
+        //             })
+        //             .attr('y', (d, i) => {
+        //                 return height - padding.bottom - d;
+        //             })
+        //             .attr('dx', rectWidth / 2)
+        //             .attr('dy', '1rem')
+        //             .text((d) => {
+        //                 return d;
+        //             });
+        //         // enter处理方法是添加元素后在赋予其相应的属性
+
+        //         enterRect.append('rect').attr('fill', 'steelblue').attr('x', (d, i) => {
+        //                 return padding.left + i * rectStep;
+        //             })
+        //             .attr('y', (d, i) => {
+        //                 return height - padding.bottom - d;
+        //             })
+        //             .attr('width', rectWidth)
+        //             .attr('height', (d) => {
+        //                 return d;
+        //             });
+        //         enterText.append('text') // 添加text元素
+        //             .attr('fill', 'white')
+        //             .attr('font-size', '14px')
+        //             .attr('text-anchor', 'middle')
+        //             .attr('x', (d, i) => {
+        //                 return padding.left + i * rectStep;
+        //             })
+        //             .attr('y', (d, i) => {
+        //                 return height - padding.bottom - d;
+        //             })
+        //             .attr('dx', rectWidth / 2)
+        //             .attr('dy', '1rem')
+        //             .text((d) => {
+        //                 return d;
+        //             });
+        //         // exit处理方法是删除多余的元素
+
+        //         exitRect.remove();
+        //     }
+
+        //     function mysort() {
+        //         d3.shuffle(dataset);
+        //         //dataset.sort(d3.ascending); //排序
+        //         draw();
+        //     }
+
+        //     function myadd() {
+        //         dataset.push(Math.floor(Math.random() * 100));
+        //         draw();
+        //     }
+        // 
+    </script>
+    // <button type="button" onclick="mysort()">排序</button>
+    // <button type="button" onclick="myadd()">增加数据</button>
+
+</body>
+
+</html>

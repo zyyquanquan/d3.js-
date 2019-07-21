@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body bgcolor="#0b0e10">
+    <script>
+        // 颜色比例尺
+        let width = 400;
+        let height = 400;
+        let dataset = d3.range(5);
+        let color = d3.schemeSet2;
+        let svg = d3.select('body').append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        let lines = [80, 120, 160, 200, 240, 280];
+        let x1 = [200, 230, 200, 200];
+        let y1 = [200, 180, 180, 200];
+        let x2 = [200, 170, 200, 200];
+        let y2 = [200, 180, 180, 200];
+        let linePathRight = d3.svg.line()
+            .x((d) => {
+                return d;
+            })
+            .y((d, i) => {
+                return y1[i];
+            });
+        let linePathLeft = d3.svg.line()
+            .x((d, i) => {
+                return d;
+            })
+            .y((d, i) => {
+                return y2[i];
+            });
+        let linePathRightChange = d3.svg.line()
+            .x((d, i) => {
+                return d;
+            })
+            .y((d, i) => {
+                if (i == 2) {
+                    return 10;
+                }
+                return y1[i];
+            });
+        let linePathLeftChange = d3.svg.line()
+            .x((d, i) => {
+                return d;
+            })
+            .y((d, i) => {
+                if (i == 2) {
+                    return 10;
+                }
+                return y2[i];
+            });
+        // 添加路径
+        svg.append('path')
+            .attr('d', linePathRight(x1))
+            .attr('stroke', '#17d5d1')
+            .attr('stroke-width', '2px')
+            .attr('fill', '#15afae')
+            .transition()
+            .duration(1000)
+            .attr('d', linePathRightChange(x1))
+        svg.append('path')
+            .attr('d', linePathLeft(x2))
+            .attr('stroke', '#17d5d1')
+            .attr('stroke-width', '2px')
+            .attr('fill', '#15afae')
+            .attr('fill-opacity', '0.5')
+            .transition()
+            .duration(1000)
+            .attr('d', linePathLeftChange(x2))
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        // 颜色比例尺
+        let width = 400;
+        let height = 400;
+        let svg = d3.select('body').append('svg')
+                                   .attr('width', width)
+                                   .attr('height', height);
+        let dataset = [80, 120, 130, 70, 60, 90];
+        let areaPath = d3.svg.area()
+                             .x((d, i) => {return 50 + i*80;})
+                             .y0((d, i) => {
+                                 return height/2;
+                             })
+                             .y1((d, i) => {
+                                 return height/2 - d;
+                             }); // 创建一个线段生成器
+        // 添加路径
+        svg.append('path')
+           .attr('d', areaPath(dataset))
+           .attr('stroke', 'black')
+           .attr('stroke-width', '3px')
+           .attr('fill', 'yellow');
+                                   
+    </script>
+</body>
+
+</html>

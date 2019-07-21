@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        // 颜色比例尺
+        let width = 400;
+        let height = 400;
+        let dataset = d3.range(5);
+        let color = d3.schemeSet2;
+        let svg = d3.select('body').append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        let lines = [80, 120, 160, 200, 240, 280];
+        let linePath = d3.svg.line()
+            //.interpolate('basis')
+            .x((d) => {
+                return d;
+            })
+            .y((d, i) => {
+                return i % 2 == 0 ? 40 : 120;
+            }); // 创建一个线段生成器
+        console.log(linePath(lines));
+        // 添加路径
+        svg.append('path')
+            .attr('d', linePath(lines))
+            .attr('stroke', 'black')
+            .attr('stroke-width', '3px')
+            .attr('fill', 'none');
+    </script>
+</body>
+
+</html>

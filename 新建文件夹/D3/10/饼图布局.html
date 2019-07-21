@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 400;
+        let height = 400;
+        let svg = d3.select('body').append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        let dataset = [
+            ['小米', 80],
+            ['iphone', 60],
+            ['华为', 100],
+        ];
+        let pie = d3.layout.pie() // 创建饼图布局
+                  .startAngle(Math.PI*0.2)
+                  .endAngle(Math.PI*1.5)
+                  .value((d) => {return d[1]});  // 值访问器
+        let piedata = pie(dataset); // 转换数据
+
+        let outerRadius = width/3; // 外半径
+        let innerRadius = 0;  // 内半径
+        // 创建弧生成器
+        let arc = d3.svg.arc()
+                  .innerRadius(innerRadius)
+                  .outerRadius(outerRadius);
+        // 创建颜色比例尺
+        let color = d3.scale.category20();
+        // 添加对应数目的弧组，即g元素
+        let arcs = svg.selectAll('g').data(piedata)
+           .enter()
+           .append('g')
+           .attr('transform', `translate(${width/2}, ${height/2})`);
+        arcs.append('path')
+            .attr('fill', (d, i) => {
+                return color(i);
+            })
+            .attr('d', (d) => {
+                return arc(d); // 使用弧生成器获取路径
+            });
+        arcs.append('text')
+            .attr('transform', (d) => {
+                let x = arc.centroid(d)[0]*2.5; // 文字的x坐标
+                let y = arc.centroid(d)[1]*2.5; // 文字的y坐标
+                return `translate(${x}, ${y})`;
+            })
+            .attr('text-anchor', 'middle')
+            .text((d) => {
+                let percent = Number(d.value/d3.sum(dataset, (d) => {
+                    return d[1];
+                }))*100;
+                return percent.toFixed(1) + '%';
+            });
+        // 添加链接弧外文字的直线元素
+        arcs.append('line')
+            .attr('stroke', 'black')
+            .attr('x1', (d) => {
+                return arc.centroid(d)[0]*2;
+            })
+            .attr('y1', (d) => {
+                return arc.centroid(d)[1]*2;
+            })
+            .attr('x2', (d) => {
+                return arc.centroid(d)[0]*2.2;
+            })
+            .attr('y2', (d) => {
+                return arc.centroid(d)[1]*2.2;
+            });
+    </script>
+</body>
+
+</html>

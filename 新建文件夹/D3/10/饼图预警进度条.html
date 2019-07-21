@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 200;
+        let height = 266;
+        let svg = d3.select('body').append('svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        let dataObj = {
+            name: '广州',
+            value: '70'
+        };
+        let waring = 80;
+        let value = Number(dataObj.value);
+        let remainder = dataObj.value % 20; // 得到余数
+        let multiple = parseInt(dataObj.value / 20); // 得到20的倍数
+        let data = [];
+        for (let index = 0; index < multiple; index++) {
+            data.push(20);
+        }
+        if (remainder !== 0) {
+            data.push(remainder);
+        }
+        if (multiple !== 5) {
+            data.push(100 - value);
+        }
+        console.log(data);
+        let pie = d3.layout.pie() // 创建饼图布局
+            .sort(null)
+            .value((d) => {
+                return d
+            }); // 值访问器
+
+        let piedata = pie(data); // 转换数据
+
+        // 创建弧生成器
+        let arc = d3.svg.arc()
+            .padAngle(0.01)
+            .innerRadius(width / 3.03)
+            .outerRadius(width / 2);
+
+        // 创建颜色比例尺
+        let color = d3.scale.category20();
+        // 添加对应数目的弧组，即g元素
+        let arcs = svg.selectAll('g').data(piedata)
+            .enter()
+            .append('g')
+            .attr('transform', `translate(${width/2}, ${height/2})`);
+
+        arcs.append('path')
+            .attr('fill', (d, i) => {
+                if (value <= waring) {
+                    if (data.length - 1 == i) {
+                        return 'transparent';
+                    } else {
+                        return '#fa3840';
+                    }
+                } else {
+                    if (value == 100) {
+                        return '1eb5b3';
+                    } else {
+                        if (data.length - 1 == i) {
+                            return 'transparent';
+                        } else {
+                            return '#1eb5b3';
+                        }
+                    }
+                }
+            })
+            .attr('d', (d) => {
+                return arc(d); // 使用弧生成器获取路径
+            });
+
+        svg.append('text')
+            .attr('transform', (d) => {
+                let x = width / 2; // 文字的x坐标
+                let y = height / 2.5; // 文字的y坐标
+                return `translate(${x}, ${y})`;
+            })
+            .attr('text-anchor', 'middle')
+            .text(`${dataObj.value}%`);
+    </script>
+</body>
+
+</html>

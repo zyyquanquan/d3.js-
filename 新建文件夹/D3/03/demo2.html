@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+<body>
+    <p>01</p>
+    <p>02</p>
+    <p>03</p>
+    <script>
+         let svg = d3.select("body")
+                     .append("svg")
+                     .attr("width", 400)
+                     .attr("height", 400);
+        svg.append("circle")
+           .attr("cx", "50px")
+           .attr("cy", "50px")
+           .attr("r", "50px")
+           .attr("fill", "red");
+         let p = d3.selectAll("p");
+         console.log(p.empty()); // 判断是否为空            
+         console.log(p.node());  // 返回第一个非空
+         console.log(p.size());  // 返回个数
+         d3.select("p").attr("id", "p0");
+         //d3.select("p").classed("red", true).classed("yellow", false);
+        d3.select("p").classed({"red": true});
+        // d3.select("p").classed("red yellow", true);
+        d3.select("p").style({ 'stroke' : 'black' , 'stroke-width' : 2 });
+        console.log(d3.select("p").text());
+
+        let body = d3.select('body');
+        body.append('p').text('111').attr('id', 'app');
+        body.insert('p', '#app').text('222');
+        d3.select('#app').remove();
+    </script>
+</body>
+</html>

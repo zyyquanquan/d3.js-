@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../js/d3.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let width = 800;
+        let height = 800;
+        let svg = d3.select('body').append('svg')
+            .attr('width', width)
+            .attr('height', height);
+
+        // 节点数组, name表示节点的名称
+        let nodes = [{
+                name: '0'
+            },
+            {
+                name: '1'
+            },
+            {
+                name: '2'
+            },
+            {
+                name: '3'
+            },
+            {
+                name: '4'
+            },
+            {
+                name: '5'
+            },
+            {
+                name: '6'
+            }
+        ]
+
+        // 连线数组 source，target表示两端的节点
+        let edges = [{
+                source: 0,
+                target: 1
+            },
+            {
+                source: 0,
+                target: 2
+            },
+            {
+                source: 0,
+                target: 3
+            },
+            {
+                source: 1,
+                target: 4
+            },
+            {
+                source: 1,
+                target: 5
+            },
+            {
+                source: 1,
+                target: 6
+            }
+        ];
+
+        // 创建力导向图布局
+        let force = d3.layout.force()
+            .nodes(nodes) // 设定节点数组
+            .links(edges) // 设定连线数组
+            .size([width, height]) // 设定作用范围
+            .linkDistance(90) // 设定连线的距离
+            .charge(-400); // 设定节点的电荷数
+
+        force.start(); // 开启布局计算
+        console.log(nodes);
+        console.log(edges);
+
+        let color = d3.scale.category20();
+
+        // 绘制连线
+        let lines = svg.selectAll('.forceLine')
+            .data(edges)
+            .enter()
+            .append('line')
+            .attr('class', 'forceLine')
+            .attr('stroke-width', '2')
+            .attr('stroke', 'red')
+
+        // 绘制节点
+        let circles = svg.selectAll('.forceCircle')
+            .data(nodes)
+            .enter()
+            .append('circle')
+            .attr('class', 'forceCircle')
+            .attr('r', '20')
+            .style('fill', (d, i) => {
+                return color(i);
+            })
+            .call(force.drag); // 允许拖动
+
+        // 绘制文字
+        let texts = svg.selectAll('.forceText')
+            .data(nodes)
+            .enter()
+            .append('text')
+            .attr('class', 'forceText')
+            .attr('x', (d) => {
+                return d.x;
+            })
+            .attr('y', (d) => {
+                return d.y;
+            })
+            .attr('dy', '.3rem')
+            .text((d) => {
+                return d.name;
+            });
+
+        // tick事件的监听器
+        force.on('tick', () => {
+            // 更新连线的端点坐标
+            lines.attr('x1', (d) => {
+                return d.source.x
+            });
+            lines.attr('y1', (d) => {
+                return d.source.y
+            });
+            lines.attr('x2', (d) => {
+                return d.target.x
+            });
+            lines.attr('y2', (d) => {
+                return d.target.y
+            });
+
+            // 更新节点坐标
+            circles.attr('cx', (d) => {
+                return d.x
+            });
+            circles.attr('cy', (d) => {
+                return d.y
+            });
+
+            // 更新节点坐标的文字
+            texts.attr('x', (d) => {
+                return d.x
+            });
+            texts.attr('y', (d) => {
+                return d.y
+            });
+        })
+
+        let drag = force.drag()
+                   .on('dragstart', function(d){
+                       d.fixed = true; // 拖拽开始后设定拖拽对象为固定
+                   }) 
+                   .on('dragend', function(d, i){
+                       d3.select(this).style('fill', color(i)) // 拖拽结束时变回原来的颜色
+                   })
+                   .on('drag', function(d, i){
+                       d3.select(this).style('fill', 'yellow') // 拖拽中变黄
+                   })
+    </script>
+</body>
+
+</html>
